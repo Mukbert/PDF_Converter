@@ -13,9 +13,6 @@ import org.apache.poi.xwpf.converter.pdf.PdfConverter;
 import org.apache.poi.xwpf.converter.pdf.PdfOptions;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
-import fr.opensagres.xdocreport.converter.ConverterTypeTo;
-import fr.opensagres.xdocreport.converter.ConverterTypeVia;
-import fr.opensagres.xdocreport.converter.Options;
 import fr.opensagres.xdocreport.converter.XDocConverterException;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
@@ -27,32 +24,16 @@ public class PDF_Converter
 {
 	public static void main(String[] args) throws IOException, XDocReportException 
 	{
-		File test = new File("test.docx");
+		File inputFile = new File("test.docx");
+		File translatetFile = new File("test1.docx");
+		File convertedFile = new File("test.pdf");
 		
-		File test1 = translateViaFreemarker(test, new File("test1.docx"));
-		
-		File freemarker = convertDocxToPdf(test1, new File("test.pdf"));
+		PDF_Converter.translateViaFreemarker(inputFile, translatetFile);
+		PDF_Converter.convertDocxToPdf(translatetFile, convertedFile);
 	}
 	
-	public static File convertDocxToPdf(File inputFile, File outputFile) throws XDocConverterException, XWPFConverterException, IOException
+	public static void translateViaFreemarker(File inputFile, File outputFile) throws IOException, XDocReportException
 	{
-		if(inputFile == null || !inputFile.exists()) throw new FileNotFoundException();
-		
-		InputStream is = new FileInputStream(inputFile);
-        XWPFDocument document = new XWPFDocument(is);
-        PdfOptions options = PdfOptions.create();
-        OutputStream out = new FileOutputStream(outputFile);
-        PdfConverter.getInstance().convert(document, out, options);
-		
-		System.out.println("Done! -> PDF_Converter.convertToPdf(File, File)");
-		
-		return outputFile;
-	}
-	
-	public static File translateViaFreemarker(File inputFile, File outputFile) throws IOException, XDocReportException
-	{
-		if(inputFile == null || !inputFile.exists()) throw new FileNotFoundException();
-		
 		InputStream in= new FileInputStream(inputFile);
 		IXDocReport report = XDocReportRegistry.getRegistry().loadReport(in,TemplateEngineKind.Freemarker);
 		
@@ -62,8 +43,21 @@ public class PDF_Converter
 		OutputStream out = new FileOutputStream(outputFile);
 		report.process(context, out);
 		
-		System.out.println("Done! -> PDF_Converter.convertViaFreemarker(File, File)");
+		in.close();
+		out.close();
 		
-		return outputFile;
+		System.out.println("Done! -> PDF_Converter.convertViaFreemarker(File, File)");
+	}
+	
+	public static void convertDocxToPdf(File inputFile, File outputFile) throws XDocConverterException, XWPFConverterException, IOException
+	{
+		InputStream is = new FileInputStream(inputFile);
+        XWPFDocument document = new XWPFDocument(is);
+        PdfOptions options = PdfOptions.create();
+        OutputStream out = new FileOutputStream(outputFile);
+        PdfConverter.getInstance().convert(document, out, options);
+        is.close();
+		out.close();
+		System.out.println("Done! -> PDF_Converter.convertToPdf(File, File)");
 	}
 }

@@ -4,17 +4,18 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.io.File;
+import java.io.IOException;
+
+import fr.opensagres.xdocreport.core.XDocReportException;
+
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
+public class AppTest extends TestCase
 {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
+	
+	
     public AppTest( String testName )
     {
         super( testName );
@@ -27,12 +28,33 @@ public class AppTest
     {
         return new TestSuite( AppTest.class );
     }
-
+    
     /**
-     * Rigourous Test :-)
+     * Rigorous Test :-)
      */
     public void testApp()
     {
         assertTrue( true );
     }
+    
+	public void testPDF() throws IOException, XDocReportException
+	{
+		try 
+		{
+			String PATH = "src/main/res";
+			
+			File inputFile 		= new File(PATH + "/test.docx");
+			File translatetFile = new File(PATH + "/testTranslatet.docx");
+			File convertedFile 	= new File(PATH + "/testConverted.pdf");
+			
+			PDF_Converter.translateViaFreemarker(inputFile, translatetFile);
+			PDF_Converter.convertDocxToPdf(translatetFile, convertedFile);
+			
+			assertTrue(true);
+		} 
+		catch (Exception e) 
+		{
+			assertTrue(false);
+		}
+	}
 }
